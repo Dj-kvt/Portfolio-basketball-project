@@ -1,0 +1,20 @@
+# Étape 1 : Image de base
+FROM node:20-alpine
+
+# Étape 2 : Répertoire de travail
+WORKDIR /app
+
+# Étape 3 : Copier les fichiers
+COPY package*.json ./
+
+# Étape 4 : Installer les dépendances
+RUN npm install
+
+# Étape 5 : Copier le reste du code
+COPY . .
+
+# Étape 6 : Exposer le port backend (5000)
+EXPOSE 5000
+
+# Étape 7 : Commande de démarrage
+CMD ["npm", "start"]
