@@ -10,11 +10,20 @@ dotenv.config();
  */
 export const register = async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const {
+      username,
+      email,
+      password,
+      role,
+      dateOfBirth,
+      placeOfBirth,
+      country,
+      postalCode,
+    } = req.body;
 
     // Vérification basique
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Tous les champs sont requis.' });
+      return res.status(400).json({ message: 'Tous les champs requis : username, email, password.' });
     }
 
     // Vérifie si l'utilisateur existe déjà
@@ -24,16 +33,21 @@ export const register = async (req, res) => {
     // Hash du mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Création de l'utilisateur
+    // Création de l'utilisateur avec les nouveaux champs
     const user = new User({
       username,
       email,
       password: hashedPassword,
       role: role || 'fan', // fan par défaut
+      dateOfBirth: dateOfBirth || null,
+      placeOfBirth: placeOfBirth || '',
+      country: country || '',
+      postalCode: postalCode || '',
     });
+
     await user.save();
 
-    return res.status(201).json({ message: 'Compte créé avec succès.' });
+    return res.status(201).json({ message: 'Compte créé avec succès.', userId: user._id });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -62,7 +76,16 @@ export const login = async (req, res) => {
     res.json({
       message: 'Connexion réussie',
       token,
-      user: { id: user._id, username: user.username, role: user.role },
+      user: {
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        dateOfBirth: user.dateOfBirth,
+        placeOfBirth: user.placeOfBirth,
+        country: user.country,
+        postalCode: user.postalCode,
+        avatar: user.avatar,
+      },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
