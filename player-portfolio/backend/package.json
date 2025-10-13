@@ -8,25 +8,33 @@
     "dev": "nodemon src/server.js",
     "test": "jest --runInBand"
   },
-  "keywords": ["express", "backend", "api", "player-portfolio"],
+  "keywords": [
+    "express",
+    "backend",
+    "api",
+    "player-portfolio"
+  ],
   "author": "Ton Nom",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "cloudinary": "^1.41.0",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.0",
-    "express": "^4.19.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.3.1",
+    "mongoose": "^8.19.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.9.3"
+    "nodemailer": "^6.10.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "supertest": "^7.0.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "supertest": "^7.0.0"
+  },
+  "directories": {
+    "test": "tests"
   }
 }
