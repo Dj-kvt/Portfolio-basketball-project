@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5000
 
 # Étape 7 : Commande de démarrage
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
