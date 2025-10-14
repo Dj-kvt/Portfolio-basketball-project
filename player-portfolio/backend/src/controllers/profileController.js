@@ -4,7 +4,7 @@ import Profile from '../models/Profile.js';
 /**
  * Créer ou mettre à jour un profil de joueur
  */
-export const upsertProfile = async (req, res) => {
+export const createProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const data = req.body;
