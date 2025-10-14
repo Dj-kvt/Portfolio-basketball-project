@@ -1,7 +1,7 @@
 // src/controllers/authController.js
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -70,7 +70,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 
     res.json({
@@ -87,6 +87,19 @@ export const login = async (req, res) => {
         avatar: user.avatar,
       },
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/**
+ * Récupérer les infos de l'utilisateur courant
+ */
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    res.json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
