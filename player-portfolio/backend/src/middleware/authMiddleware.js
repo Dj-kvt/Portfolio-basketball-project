@@ -1,7 +1,10 @@
+// src/middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-export const protect = async (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   try {
     // Vérifier la présence du token dans l’en-tête
     const token = req.headers.authorization?.split(" ")[1];
@@ -12,7 +15,7 @@ export const protect = async (req, res, next) => {
     // Vérifier la validité du token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Charger l’utilisateur associé
+    // Charger l’utilisateur associé (exclure le mot de passe)
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
