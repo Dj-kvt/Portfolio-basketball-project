@@ -45,3 +45,25 @@ export const getProfileById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+/**
+ * Mettre à jour le profil
+ */
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = req.body;
+
+    const profile = await Profile.findOneAndUpdate(
+      { user: userId },
+      data,
+      { new: true }
+    );
+
+    if (!profile) return res.status(404).json({ message: 'Profil introuvable' });
+
+    res.json(profile);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
