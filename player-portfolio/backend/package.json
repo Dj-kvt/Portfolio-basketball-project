@@ -1,6 +1,7 @@
 {
   "name": "player-portfolio-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend API for Player Portfolio Web (Node.js + Express + MongoDB)",
   "main": "src/server.js",
   "scripts": {
@@ -31,7 +32,7 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.0",
+    "nodemon": "^3.1.10",
     "supertest": "^7.0.0"
   },
   "directories": {
