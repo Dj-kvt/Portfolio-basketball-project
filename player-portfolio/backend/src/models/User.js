@@ -30,6 +30,22 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // 🔹 Nouveaux champs pour informations personnelles
+    dateOfBirth: {
+      type: Date,
+    },
+    placeOfBirth: {
+      type: String,
+      trim: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+    },
+    postalCode: {
+      type: String,
+      trim: true,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
