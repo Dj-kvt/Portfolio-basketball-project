@@ -103,6 +103,12 @@ export const login = async (req, res) => {
 
     // Vérifie le mot de passe
     const match = await bcrypt.compare(password, user.password);
+    console.log("---- DEBUG LOGIN ----");
+    console.log("Mot de passe reçu:", password);
+    console.log("Mot de passe hashé stocké:", user.password);
+    console.log("Résultat comparaison bcrypt:", match);
+    console.log("----------------------");
+
     if (!match)
       return res.status(400).json({ message: "Mot de passe incorrect." });
 
