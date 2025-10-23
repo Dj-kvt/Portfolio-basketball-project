@@ -8,6 +8,9 @@ import authRoutes from './routes/auth.js';
 import profileRoutes from './routes/profiles.js';
 import mediaRoutes from './routes/media.js';
 import contactRoutes from './routes/contact.js';
+import postRoutes from './routes/posts.js';
+import commentRoutes from "./routes/comments.js";
+import storyRoutes from "./routes/stories.js";
 
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -26,6 +29,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/posts', postRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/stories", storyRoutes);
 
 // Health Check
 app.get('/', (req, res) => {
