@@ -7,7 +7,7 @@ const LoginForm = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // <-- état pour œil
+  const [showPassword, setShowPassword] = useState(false); // état pour œil
 
   const handleChange = (e) =>
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -37,6 +37,7 @@ const LoginForm = () => {
         value={credentials.email}
         onChange={handleChange}
         placeholder="Your email"
+        inputClassName="bg-white text-black" // texte noir
       />
 
       {/* Password avec œil */}
@@ -44,11 +45,19 @@ const LoginForm = () => {
         <InputField
           label="Password"
           name="password"
-          type={showPassword ? "text" : "password"} // <-- type selon l’état
+          type={showPassword ? "text" : "password"}
           value={credentials.password}
           onChange={handleChange}
           placeholder="Your password"
+          inputClassName="bg-white text-black" // texte noir
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute top-[38px] right-2 text-gray-500"
+        >
+          {showPassword ? "🙈" : "👁️"}
+        </button>
       </div>
 
       <button

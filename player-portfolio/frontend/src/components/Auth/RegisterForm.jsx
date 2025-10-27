@@ -59,6 +59,7 @@ const RegisterForm = () => {
         value={form.username}
         onChange={handleChange}
         placeholder="Your username"
+        inputClassName="bg-white text-black" // texte noir
       />
       <InputField
         label="Email"
@@ -67,6 +68,7 @@ const RegisterForm = () => {
         value={form.email}
         onChange={handleChange}
         placeholder="Your email"
+        inputClassName="bg-white text-black"
       />
 
       {/* Password */}
@@ -78,6 +80,7 @@ const RegisterForm = () => {
           value={form.password}
           onChange={handleChange}
           placeholder="Your password"
+          inputClassName="bg-white text-black"
         />
         <button
           type="button"
@@ -97,23 +100,25 @@ const RegisterForm = () => {
           value={form.confirmPassword}
           onChange={handleChange}
           placeholder="Confirm password"
+          inputClassName="bg-white text-black"
         />
         <button
           type="button"
-          onClick={() => setShowPassword(!showPassword)} // <-- même état
+          onClick={() => setShowPassword(!showPassword)}
           className="absolute top-[38px] right-2 text-gray-500"
         >
           {showPassword ? "🙈" : "👁️"}
         </button>
       </div>
 
+      {/* Role selection */}
       <div className="flex flex-col mb-3">
-        <label className="text-sm font-medium mb-1">Role</label>
+        <label className="text-sm font-medium mb-1 text-white">Role</label>
         <select
           name="role"
           value={form.role}
           onChange={handleChange}
-          className="border p-2 rounded-lg"
+          className="border p-2 rounded-lg bg-white text-black"
         >
           <option value="athlete">Athlete</option>
           <option value="recruiter">Recruiter</option>
@@ -127,6 +132,7 @@ const RegisterForm = () => {
         name="dateOfBirth"
         value={form.dateOfBirth}
         onChange={handleChange}
+        inputClassName="bg-white text-black"
       />
       <InputField
         label="Place of birth"
@@ -134,6 +140,7 @@ const RegisterForm = () => {
         value={form.placeOfBirth}
         onChange={handleChange}
         placeholder="City"
+        inputClassName="bg-white text-black"
       />
       <InputField
         label="Country"
@@ -141,6 +148,7 @@ const RegisterForm = () => {
         value={form.country}
         onChange={handleChange}
         placeholder="Country"
+        inputClassName="bg-white text-black"
       />
       <InputField
         label="Postal code"
@@ -148,6 +156,7 @@ const RegisterForm = () => {
         value={form.postalCode}
         onChange={handleChange}
         placeholder="Postal code"
+        inputClassName="bg-white text-black"
       />
 
       <button
