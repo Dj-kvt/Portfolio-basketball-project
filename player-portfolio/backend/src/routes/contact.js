@@ -1,11 +1,13 @@
 import express from "express";
 import { sendMessage, getMessagesForPlayer } from "../controllers/contactController.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { verifyToken, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// 🧩 Contact routes
-router.post("/", verifyToken, sendMessage);                 // POST /api/contact
-router.get("/:playerId", verifyToken, getMessagesForPlayer); // GET /api/contact/:playerId
+// Seuls les recruteurs & joueurs peuvent envoyer un message
+router.post("/", verifyToken, authorizeRoles("recruiter", "athlete"), sendMessage);
+
+// Tous les utilisateurs connectés peuvent voir leurs messages
+router.get("/:username", verifyToken, getMessagesForPlayer);
 
 export default router;
