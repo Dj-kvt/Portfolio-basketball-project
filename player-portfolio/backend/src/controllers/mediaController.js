@@ -1,9 +1,11 @@
-// src/controllers/mediaController.js
 import Media from "../models/Media.js";
-import { uploadToCloudinary } from "../services/uploadService.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../services/uploadService.js";
 
 /**
- * Upload un média (image/vidéo)
+ * Upload d'un média (image ou vidéo)
+ * - Vérifie que le fichier est présent
+ * - Upload sur Cloudinary
+ * - Sauvegarde dans MongoDB avec owner
  */
 export const uploadMedia = async (req, res) => {
   try {
@@ -12,13 +14,13 @@ export const uploadMedia = async (req, res) => {
       return res.status(400).json({ success: false, message: "Aucun fichier fourni." });
     }
 
-    const result = await uploadToCloudinary(file.path);
+    const result = await uploadToCloudinary(file.path, "media");
 
     const media = await Media.create({
       fileUrl: result.secure_url,
+      publicId: result.public_id,
       fileType: file.mimetype.startsWith("video") ? "video" : "image",
-      uploadedBy: req.user.id,
-      role: req.user.role,
+      owner: req.user.id,
       uploadedAt: new Date(),
     });
 
@@ -30,12 +32,14 @@ export const uploadMedia = async (req, res) => {
 };
 
 /**
- * Récupérer tous les médias pour le feed public
+ * Récupération du feed public
+ * - Trie par date décroissante
+ * - Popule les infos de l'owner
  */
 export const getFeed = async (req, res) => {
   try {
     const medias = await Media.find()
-      .populate("uploadedBy", "username role")
+      .populate("owner", "username role")
       .sort({ uploadedAt: -1 });
 
     res.status(200).json({ success: true, medias });
@@ -46,15 +50,24 @@ export const getFeed = async (req, res) => {
 };
 
 /**
- * Supprimer un média
+ * Suppression d'un média
+ * - Vérifie que l'utilisateur est owner ou admin
+ * - Supprime le média sur Cloudinary si publicId existant
+ * - Supprime le document MongoDB
  */
 export const deleteMedia = async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
-    if (!media) return res.status(404).json({ success: false, message: "Média introuvable." });
+    if (!media) {
+      return res.status(404).json({ success: false, message: "Média introuvable." });
+    }
 
-    if (media.uploadedBy.toString() !== req.user.id && req.user.role !== "admin") {
+    if (media.owner.toString() !== req.user.id && req.user.role !== "admin") {
       return res.status(403).json({ success: false, message: "Action non autorisée." });
+    }
+
+    if (media.publicId) {
+      await deleteFromCloudinary(media.publicId);
     }
 
     await media.deleteOne();

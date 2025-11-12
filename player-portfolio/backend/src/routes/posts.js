@@ -4,8 +4,8 @@ import {
   createPost,
   getAllPosts,
   toggleLike,
-  deletePost,
 } from "../controllers/postController.js";
+import { getUserPosts } from "../controllers/postController.js";
 
 const router = express.Router();
 
@@ -13,12 +13,12 @@ const router = express.Router();
 router.post("/", verifyToken, createPost);
 
 // 📥 Récupérer tous les posts (feed public)
-router.get("/", getAllPosts);
+router.get("/", verifyToken, getAllPosts);
+
+router.get("/user/:id", verifyToken, getUserPosts);
 
 // ❤️ Like / Unlike un post
 router.patch("/:id/like", verifyToken, toggleLike);
 
-// 🗑️ Supprimer un post
-router.delete("/:id", verifyToken, deletePost);
 
 export default router;
