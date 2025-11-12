@@ -6,24 +6,31 @@ dotenv.config();
 
 export const verifyToken = async (req, res, next) => {
   try {
-    // Vérifier la présence du token dans l’en-tête
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       return res.status(401).json({ message: "Accès refusé. Aucun token fourni." });
     }
 
-    // Vérifier la validité du token
+    // Décodage du token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Charger l’utilisateur associé (exclure le mot de passe)
+    // Recherche complète de l'utilisateur
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
     }
 
-    req.user = user; // Attacher l’utilisateur à la requête
+    // Ajout explicite des champs nécessaires
+    req.user = {
+      id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
+
     next();
   } catch (error) {
+    console.error("❌ Erreur verifyToken:", error);
     res.status(401).json({ message: "Token invalide ou expiré.", error: error.message });
   }
 };

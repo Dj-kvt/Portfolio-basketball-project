@@ -1,4 +1,4 @@
-// src/models/Profile.js
+// backend/src/models/Profile.js
 import mongoose from "mongoose";
 
 const profileSchema = new mongoose.Schema(
@@ -8,6 +8,7 @@ const profileSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    avatar: { type: String, default: "" }, // ✅ ajout
     bio: { type: String, maxlength: 500 },
     position: String,
     team: String,
@@ -23,6 +24,9 @@ const profileSchema = new mongoose.Schema(
       tiktok: String,
       youtube: String,
     },
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

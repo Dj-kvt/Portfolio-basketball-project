@@ -1,40 +1,45 @@
-import nodemailer from "nodemailer";
+// src/services/emailService.js
+import Mailjet from "node-mailjet";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// 📬 Configuration du transporteur email
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: false, // true pour 465, false pour les autres
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const mailjet = Mailjet.apiConnect(
+  process.env.MJ_APIKEY_PUBLIC,
+  process.env.MJ_APIKEY_PRIVATE
+);
 
 /**
- * Envoie un email
- * @param {string} to - Adresse du destinataire
+ * Envoie un email via l'API Mailjet
+ * @param {string} toEmail - Email du destinataire
  * @param {string} subject - Sujet de l’email
- * @param {string} text - Contenu texte brut
- * @param {string} html - Contenu HTML optionnel
+ * @param {string} message - Contenu du message (texte)
  */
-export const sendEmail = async (to, subject, text, html = "") => {
+export const sendEmail = async (toEmail, subject, message) => {
   try {
-    const mailOptions = {
-      from: `"Player Portfolio" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      text,
-      html,
-    };
+    const response = await mailjet.post("send", { version: "v3.1" }).request({
+      Messages: [
+        {
+          From: {
+            Email: process.env.EMAIL_FROM,
+            Name: "Player Portfolio",
+          },
+          To: [
+            {
+              Email: toEmail,
+            },
+          ],
+          Subject: subject,
+          TextPart: message,
+          HTMLPart: `<p>${message}</p>`,
+        },
+      ],
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Email envoyé à ${to}: ${info.messageId}`);
+    console.log(`✅ Email envoyé à ${toEmail}:`, response.body.Messages[0].To[0].Email);
+    return true;
   } catch (error) {
-    console.error("❌ Erreur d’envoi d’email:", error);
-    throw new Error("Impossible d’envoyer l’email");
+    console.error("❌ Erreur lors de l’envoi du mail:", error.message);
+    throw new Error("Impossible d’envoyer l’email via Mailjet API");
   }
 };

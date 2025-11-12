@@ -1,39 +1,51 @@
-// frontend/src/api/postApi.js
+// frontend/src/api/profileApi.js
 import axios from "../utils/axiosInstance";
 
-// 📥 Récupérer le flux de publications
-export const getFeed = async () => {
-  const res = await axios.get("/posts");
-  return res.data.posts || res.data; // tolérant aux formats
+// Tous les profils
+export const getAllProfiles = async () => {
+  const res = await axios.get("/profiles");
+  return res.data;
 };
 
-// 📤 Créer un post (upload image + texte)
-export const createPost = async (file, caption) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  if (caption) formData.append("caption", caption);
+// Profil par ID
+export const getProfileById = async (id) => {
+  const res = await axios.get(`/profiles/${id}`);
+  return res.data;
+};
 
-  const res = await axios.post("/posts", formData, {
+// Profil connecté
+export const getMyProfile = async () => {
+  const res = await axios.get("/profiles/me");
+  return res.data;
+};
+
+// Mise à jour du profil
+export const updateProfile = async (id, data) => {
+  const res = await axios.put(`/profiles/${id}`, data);
+  return res.data;
+};
+
+// Upload avatar
+export const uploadAvatar = async (file) => {
+  const formData = new FormData();
+  formData.append("avatar", file);
+  const res = await axios.post("/avatar/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
 };
 
-// ❤️ Like/unlike un post
-export const toggleLike = async (postId) => {
-  const res = await axios.post(`/posts/${postId}/like`);
-  return res.data;
-};
-
-// 🗑️ Supprimer un post
-export const deletePost = async (postId) => {
-  const res = await axios.delete(`/posts/${postId}`);
+// Follow / Unfollow
+export const followUser = async (userId) => {
+  const res = await axios.post(`/profiles/${userId}/follow`);
   return res.data;
 };
 
 export default {
-  getFeed,
-  createPost,
-  toggleLike,
-  deletePost,
+  getAllProfiles,
+  getProfileById,
+  getMyProfile,
+  updateProfile,
+  uploadAvatar,
+  followUser,
 };

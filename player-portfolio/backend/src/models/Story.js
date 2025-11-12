@@ -1,25 +1,32 @@
+// src/models/Story.js
 import mongoose from "mongoose";
 
 const storySchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    imageUrl: {
-      type: String,
+    media: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Media",
       required: true,
     },
     expiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+      required: true,
+    },
+    visibility: {
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
     },
   },
   { timestamps: true }
 );
 
-// TTL index pour suppression automatique
+// 🧹 Supprime automatiquement les stories expirées
 storySchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model("Story", storySchema);

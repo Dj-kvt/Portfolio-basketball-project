@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Étape 3 : Copier package.json et installer dépendances
 COPY package*.json ./
-RUN npm install
+RUN npm install && npm install lucide-react
 
 
 # Étape 4 : Copier le reste du code
