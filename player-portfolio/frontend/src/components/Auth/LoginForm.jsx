@@ -1,0 +1,97 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../api/authApi";
+import InputField from "../Common/InputField";
+
+const LoginForm = () => {
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e) =>
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await loginUser(credentials);
+
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+        setMessage("Login successful!");
+        // 🏠 Redirection après connexion réussie
+        setTimeout(() => {
+          navigate("/home");
+        }, 1000);
+      } else {
+        setMessage("No token received from server.");
+      }
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Invalid credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      {/* Email */}
+      <InputField
+        label="Email"
+        name="email"
+        type="email"
+        value={credentials.email}
+        onChange={handleChange}
+        placeholder="Your email"
+        inputClassName="bg-white text-black"
+      />
+
+      {/* Password avec icône 👁️ */}
+      <div className="relative">
+        <InputField
+          label="Password"
+          name="password"
+          type={showPassword ? "text" : "password"}
+          value={credentials.password}
+          onChange={handleChange}
+          placeholder="Your password"
+          inputClassName="bg-white text-black"
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute top-[38px] right-2 text-gray-500"
+        >
+          {showPassword ? "🙈" : "👁️"}
+        </button>
+      </div>
+
+      {/* Bouton de connexion */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-indigo-600 text-white rounded-lg py-2 hover:bg-indigo-700 transition"
+      >
+        {loading ? "Connecting..." : "Login"}
+      </button>
+
+      {/* Message de retour */}
+      {message && (
+        <p
+          className={`text-center text-sm mt-2 ${
+            message.includes("successful") ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </p>
+      )}
+    </form>
+  );
+};
+
+export default LoginForm;

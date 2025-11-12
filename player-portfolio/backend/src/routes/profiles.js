@@ -1,18 +1,24 @@
+// src/routes/profiles.js
 import express from "express";
 import {
   createProfile,
   getProfileById,
   updateProfile,
-  getAllProfiles
+  getAllProfiles,
+  getMyProfile,
+  followUser
 } from "../controllers/profileController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// 🧩 Profile routes
-router.post("/", verifyToken, createProfile);        // POST /api/profiles
-router.get("/", getAllProfiles);                     // GET /api/profiles
-router.get("/:id", getProfileById);                  // GET /api/profiles/:id
-router.put("/:id", verifyToken, updateProfile);      // PUT /api/profiles/:id
+router.post("/", verifyToken, createProfile);
+router.get("/", getAllProfiles);
+
+router.get("/me", verifyToken, getMyProfile);
+
+router.get("/:id", verifyToken, getProfileById);
+router.put("/:id", verifyToken, updateProfile);
+router.post("/:id/follow", verifyToken, followUser);
 
 export default router;

@@ -1,44 +1,39 @@
-import { v2 as cloudinary } from "cloudinary";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-// ⚙️ Configuration Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// src/services/uploadService.js
+import cloudinary from "../config/cloudinary.js";
 
 /**
  * Upload un fichier sur Cloudinary
  * @param {string} filePath - chemin temporaire du fichier local
- * @param {string} folder - dossier Cloudinary (ex: 'athletes', 'fans')
+ * @param {string} folder - dossier Cloudinary (ex: "posts", "profiles", "stories")
  */
 export const uploadToCloudinary = async (filePath, folder = "media") => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
       folder,
-      resource_type: "auto", // détecte automatiquement image/vidéo
+      resource_type: "auto", // auto: image ou vidéo
     });
 
-    return result.secure_url; // retourne l’URL publique
+    return {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+      resource_type: result.resource_type,
+    };
   } catch (error) {
-    console.error("❌ Erreur upload Cloudinary:", error);
-    throw new Error("Échec de l’upload du média");
+    console.error("Erreur upload Cloudinary:", error);
+    throw new Error("Échec de l’upload sur Cloudinary");
   }
 };
 
 /**
- * Supprime un fichier de Cloudinary (optionnel)
- * @param {string} publicId - identifiant du fichier sur Cloudinary
+ * Supprime un fichier de Cloudinary
+ * @param {string} publicId - identifiant public du fichier
  */
 export const deleteFromCloudinary = async (publicId) => {
   try {
     await cloudinary.uploader.destroy(publicId);
-    console.log(`🗑️ Média supprimé: ${publicId}`);
+    console.log(`Média supprimé de Cloudinary: ${publicId}`);
   } catch (error) {
-    console.error("❌ Erreur suppression Cloudinary:", error);
-    throw new Error("Échec suppression média");
+    console.error("Erreur suppression Cloudinary:", error);
+    throw new Error("Échec de la suppression sur Cloudinary");
   }
 };

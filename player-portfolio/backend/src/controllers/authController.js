@@ -1,7 +1,6 @@
 // src/controllers/authController.js
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -46,14 +45,11 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Cet email est déjà utilisé." });
     }
 
-    //  Hash sécurisé du mot de passe
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     //  Création du nouvel utilisateur
     const user = new User({
       username,
       email,
-      password: hashedPassword,
+      password,
       role,
       dateOfBirth,
       placeOfBirth,
@@ -102,13 +98,7 @@ export const login = async (req, res) => {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
 
     // Vérifie le mot de passe
-    const match = await bcrypt.compare(password, user.password);
-    console.log("---- DEBUG LOGIN ----");
-    console.log("Mot de passe reçu:", password);
-    console.log("Mot de passe hashé stocké:", user.password);
-    console.log("Résultat comparaison bcrypt:", match);
-    console.log("----------------------");
-
+    const match = await user.matchPassword(password);
     if (!match)
       return res.status(400).json({ message: "Mot de passe incorrect." });
 

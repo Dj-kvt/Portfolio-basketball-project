@@ -1,11 +1,13 @@
 import express from "express";
-import { sendMessage, getMessagesForPlayer } from "../controllers/contactController.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { sendMessage, getMyMessages } from "../controllers/contactController.js";
+import { verifyToken, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// 🧩 Contact routes
-router.post("/", verifyToken, sendMessage);                 // POST /api/contact
-router.get("/:playerId", verifyToken, getMessagesForPlayer); // GET /api/contact/:playerId
+// POST /api/contact : envoyer un message (recruiter ou athlete)
+router.post("/", verifyToken, authorizeRoles("recruiter", "athlete"), sendMessage);
+
+// GET /api/contact-me : récupérer tous les messages reçus pour l’utilisateur connecté
+router.get("/me", verifyToken, getMyMessages);
 
 export default router;

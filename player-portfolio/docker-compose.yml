@@ -10,19 +10,19 @@ services:
       - mongo
     volumes:
       - ./backend:/app
-    command: npm run dev
+    command: npm run dev -- --host
 
   frontend:
     build: ./frontend
     ports:
-      - "3000:5173"
+      - "5173:5173"
     env_file:
       - ./frontend/.env
     depends_on:
       - backend
     volumes:
       - ./frontend:/app
-    command: npm run dev
+    command: npm run dev -- --host 0.0.0.0
 
   mongo:
     image: mongo:6
