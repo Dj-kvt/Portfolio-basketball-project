@@ -11,6 +11,9 @@ import contactRoutes from "./routes/contact.js";
 import postRoutes from "./routes/posts.js";
 import commentRoutes from "./routes/comments.js";
 import storyRoutes from "./routes/stories.js";
+import avatarRoutes from "./routes/avatarRoutes.js";
+import userRoutes from "./routes/users.js";
+import searchRoutes from "./routes/search.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -48,6 +51,9 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/posts", postRoutes); // multer gère ici dans la route elle-même
 app.use("/api/comments", commentRoutes);
 app.use("/api/stories", storyRoutes);
+app.use("/api/avatar", avatarRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/search", searchRoutes);
 
 // Health Check
 app.get("/", (req, res) => {
