@@ -1,65 +1,100 @@
+// src/controllers/storyController.js
 import Story from "../models/Story.js";
+import Media from "../models/Media.js";
 import { uploadToCloudinary } from "../services/uploadService.js";
 
-/**
- * Créer une story
- */
+// 📤 Upload + création d'une story
 export const uploadStory = async (req, res) => {
   try {
-    const file = req.file;
-    if (!file) {
-      return res.status(400).json({ success: false, message: "Aucune image fournie." });
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Aucun fichier reçu." });
     }
 
-    const result = await uploadToCloudinary(file.path, "stories");
+    console.log("📸 Fichier reçu :", req.file.path);
 
-    const story = await Story.create({
-      userId: req.user.id,
-      imageUrl: result.secure_url,
+    // ✅ On récupère toutes les infos depuis Cloudinary
+    const uploadResult = await uploadToCloudinary(req.file.path, "stories");
+
+    console.log("☁️ Cloudinary upload réussi :", uploadResult);
+
+    // ✅ Création du média (on utilise les champs corrects)
+    const media = await Media.create({
+      fileUrl: uploadResult.secure_url, // ✅ on stocke seulement l’URL publique
+      publicId: uploadResult.public_id, // utile si on veut le supprimer plus tard
+      fileType: uploadResult.resource_type || "image",
+      owner: req.user.id,
+      visibility: "public",
     });
 
-    res.status(201).json({ success: true, story });
-  } catch (error) {
-    console.error("Erreur upload story:", error);
-    res.status(500).json({ success: false, message: "Erreur lors de l’upload de la story." });
+    console.log("🧩 Média créé :", media._id);
+
+    // ✅ Création de la story
+    const story = await Story.create({
+      user: req.user.id,
+      media: media._id,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+    });
+
+    console.log("✅ Story créée :", story._id);
+
+    // ✅ Peupler les données liées
+    const populatedStory = await story.populate([
+      { path: "user", select: "username role" },
+      { path: "media", select: "fileUrl fileType" },
+    ]);
+
+    res.status(201).json({ success: true, story: populatedStory });
+  } catch (err) {
+    console.error("❌ Erreur détaillée :", err);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la création de la story.",
+      error: err.message,
+    });
   }
 };
 
-/**
- * Récupérer toutes les stories valides (non expirées)
- */
+// 📥 Récupérer toutes les stories actives
 export const getStories = async (req, res) => {
   try {
-    const now = new Date();
-    const stories = await Story.find({ expiresAt: { $gt: now } })
-      .populate("userId", "username avatar")
+    const stories = await Story.find({ expiresAt: { $gt: new Date() } })
+      .populate({ path: "user", select: "username role" })
+      .populate({ path: "media", select: "fileUrl fileType" })
       .sort({ createdAt: -1 });
 
-    res.status(200).json({ success: true, stories });
-  } catch (error) {
-    console.error("Erreur récupération stories:", error);
-    res.status(500).json({ success: false, message: "Impossible de récupérer les stories." });
+    res.json({ success: true, stories });
+  } catch (err) {
+    console.error("❌ Erreur récupération stories:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur de récupération des stories." });
   }
 };
 
-/**
- * Supprimer une story
- */
+// 🗑️ Supprimer une story
 export const deleteStory = async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
     if (!story) {
-      return res.status(404).json({ success: false, message: "Story introuvable." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Story introuvable." });
     }
 
-    if (story.userId.toString() !== req.user.id && req.user.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Action non autorisée." });
+    if (story.user.toString() !== req.user.id) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Action non autorisée." });
     }
 
     await story.deleteOne();
-    res.status(200).json({ success: true, message: "Story supprimée avec succès." });
-  } catch (error) {
-    console.error("Erreur suppression story:", error);
-    res.status(500).json({ success: false, message: "Erreur lors de la suppression de la story." });
+    res.json({ success: true, message: "Story supprimée." });
+  } catch (err) {
+    console.error("❌ Erreur suppression story:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur suppression story." });
   }
 };
