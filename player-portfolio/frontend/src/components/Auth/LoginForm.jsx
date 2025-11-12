@@ -1,13 +1,14 @@
-// frontend/src/components/Auth/LoginForm.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/authApi";
 import InputField from "../Common/InputField";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // état pour œil
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) =>
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -19,8 +20,17 @@ const LoginForm = () => {
 
     try {
       const res = await loginUser(credentials);
-      localStorage.setItem("token", res.token);
-      setMessage("Login successful!");
+
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+        setMessage("Login successful!");
+        // 🏠 Redirection après connexion réussie
+        setTimeout(() => {
+          navigate("/home");
+        }, 1000);
+      } else {
+        setMessage("No token received from server.");
+      }
     } catch (err) {
       setMessage(err.response?.data?.message || "Invalid credentials.");
     } finally {
@@ -30,6 +40,7 @@ const LoginForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
+      {/* Email */}
       <InputField
         label="Email"
         name="email"
@@ -37,10 +48,10 @@ const LoginForm = () => {
         value={credentials.email}
         onChange={handleChange}
         placeholder="Your email"
-        inputClassName="bg-white text-black" // texte noir
+        inputClassName="bg-white text-black"
       />
 
-      {/* Password avec œil */}
+      {/* Password avec icône 👁️ */}
       <div className="relative">
         <InputField
           label="Password"
@@ -49,7 +60,7 @@ const LoginForm = () => {
           value={credentials.password}
           onChange={handleChange}
           placeholder="Your password"
-          inputClassName="bg-white text-black" // texte noir
+          inputClassName="bg-white text-black"
         />
         <button
           type="button"
@@ -60,6 +71,7 @@ const LoginForm = () => {
         </button>
       </div>
 
+      {/* Bouton de connexion */}
       <button
         type="submit"
         disabled={loading}
@@ -68,6 +80,7 @@ const LoginForm = () => {
         {loading ? "Connecting..." : "Login"}
       </button>
 
+      {/* Message de retour */}
       {message && (
         <p
           className={`text-center text-sm mt-2 ${
